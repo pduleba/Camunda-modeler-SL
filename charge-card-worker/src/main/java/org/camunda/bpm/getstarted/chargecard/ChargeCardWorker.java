@@ -13,18 +13,17 @@ public class ChargeCardWorker {
 				.build();
 
 		// subscribe to an external task topic as specified in the process
-		client.subscribe("charge-card").lockDuration(1000) // the default lock duration is 20 seconds, but you can
-															// override this
+		client.subscribe("charge-card").lockDuration(1000) // the default lock duration is 20 seconds
+
 				.handler((externalTask, externalTaskService) -> {
-					// Put your business logic here
+					// Get
+					String name = (String) externalTask.getVariable("name");
+					Long price = (Long) externalTask.getVariable("price");
 
-					// Get a process variable
-					String item = (String) externalTask.getVariable("item");
-					Long amount = (Long) externalTask.getVariable("amount");
-					LOGGER.info(
-							"Charging credit card with an amount of '" + amount + "'€ for the item '" + item + "'...");
+					// Process
+					LOGGER.info("Charging credit card :: price '" + price + "'$ of '" + name + "'...");
 
-					// Complete the task
+					// Complete
 					externalTaskService.complete(externalTask);
 				}).open();
 	}
