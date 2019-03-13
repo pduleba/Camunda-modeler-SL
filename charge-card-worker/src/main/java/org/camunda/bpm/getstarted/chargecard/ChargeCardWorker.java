@@ -1,30 +1,32 @@
 package org.camunda.bpm.getstarted.chargecard;
 
-import java.util.logging.Logger;
-
 import org.camunda.bpm.client.ExternalTaskClient;
 
+import java.util.logging.Logger;
+
 public class ChargeCardWorker {
-	private final static Logger LOGGER = Logger.getLogger(ChargeCardWorker.class.getName());
 
-	public static void main(String[] args) {
-		ExternalTaskClient client = ExternalTaskClient.create().baseUrl("http://localhost:8080/engine-rest")
-				.asyncResponseTimeout(10000) // long polling timeout
-				.build();
+    private final static Logger LOGGER = Logger.getLogger(ChargeCardWorker.class.getName());
 
-		// subscribe to an external task topic as specified in the process
-		client.subscribe("charge-card").lockDuration(1000) // the default lock duration is 20 seconds
+    public static void main(String[] args) {
+        ExternalTaskClient client = ExternalTaskClient.create()
+                .baseUrl("http://localhost:8080/engine-rest")
+                .asyncResponseTimeout(10000) // long polling timeout
+                .build();
 
-				.handler((externalTask, externalTaskService) -> {
-					// Get
-					String name = (String) externalTask.getVariable("name");
-					Long price = (Long) externalTask.getVariable("price");
+        // Subscribe
+        client.subscribe("charge-card")
+                .lockDuration(1000)
+                .handler((externalTask, externalTaskService) -> {
 
-					// Process
-					LOGGER.info("Charging credit card :: price '" + price + "'$ of '" + name + "'...");
+                    // Process
+                    Object name = externalTask.getVariable("name");
+                    Object price = externalTask.getVariable("price");
+                    LOGGER.info("Payment " + price + "€ for '" + name);
 
-					// Complete
-					externalTaskService.complete(externalTask);
-				}).open();
-	}
+                    // Complete
+                    externalTaskService.complete(externalTask);
+                })
+                .open();
+    }
 }
