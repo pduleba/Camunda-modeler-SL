@@ -22,7 +22,7 @@ public class ChargeCardWorker {
                     // Process
                     Object name = externalTask.getVariable("name");
                     Object price = externalTask.getVariable("price");
-                    LOGGER.info("Payment " + price + "€ for '" + name);
+                    LOGGER.info("Payment " + price + " for " + name);
 
                     // Complete
                     externalTaskService.complete(externalTask);
